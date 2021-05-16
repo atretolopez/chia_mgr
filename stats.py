@@ -45,7 +45,6 @@ def getStatistics(directory):
     for filename in os.listdir(directory):
         file = os.path.join(directory, filename)
         if os.path.isfile(file):
-
             stats_map["Start_time"].append(datetime.datetime.fromtimestamp(os.path.getctime(file)))
             log = open(file, "r")
             for line in log:
