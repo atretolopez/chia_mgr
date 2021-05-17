@@ -1,22 +1,14 @@
+import logging
 
 import helpers
 import os
 import pandas
 import datetime
 
-def runStatsFromUser():
-    '''
-
-    :return:
-    '''
-    # get user path
-    user_path = helpers.getUserNamePath()
-
-    # get plotter path
-    plotter_path = os.path.join(user_path, '.chia', 'mainnet', 'plotter')
-
+def runStats(plotter_path):
     # check the directory exists
     if not os.path.isdir(plotter_path):
+        logging.error("Unable to find plot logs")
         raise FileNotFoundError
 
     # get stats from

@@ -64,41 +64,52 @@ def Run(args):
 CHIA="chia"
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("-s", "--stats", action="store_true", help="Show statistics and exit")
-    parser.add_argument("-p", "--plot", action="store_true", help="Plot options")
-    parser.add_argument("--disc_space", default=1024, type=int, help="Disc Space in GB")
-    parser.add_argument("--cpu_threshold", default=50.0, type=float, help="CPU Threshold in percentage")
-    parser.add_argument("--size", default=32, help="")
-    parser.add_argument("--num", default=1, help="")
-    parser.add_argument("--buffer", default=3389, help="")
-    parser.add_argument("--num_threads", default=2, help="")
-    parser.add_argument("--buckets", default=128, help="")
-    parser.add_argument("--alt_fingerprint", default=None, help="")
-    parser.add_argument("--farmer_public_key", default=None, help="")
-    parser.add_argument("--pool_public_key", default=None, help="")
-    parser.add_argument("--final_dir", required=True, help="Final directory for PLots results")
-    parser.add_argument("--tmp_dir", default=os.path.join(helpers.getUserNamePath(), "tmp_plot_dir"), help="")
-    parser.add_argument("--tmp2_dir", default=os.path.join(helpers.getUserNamePath(), "tmp2_plot_dir"), help="")
+    subparsers = parser.add_subparsers()
+
+    # adds statistics subparser
+    stats_subparser = subparsers.add_parser(name="stats")
+    stats_subparser.add_argument("-s", "--show", action="store_true", help="Show statistics and exit")
+    stats_subparser.add_argument("-d", "--dir", default=os.path.join(helpers.getUserNamePath(), '.chia', 'mainnet', 'plotter'), help="Log path")
+
+    # plot operations
+    plot_subparser = subparsers.add_parser(name="plot")
+    plot_subparser.add_argument("--disc_space", default=1024, type=int, help="Disc Space in GB")
+    plot_subparser.add_argument("--cpu_threshold", default=50.0, type=float, help="CPU Threshold in percentage")
+    plot_subparser.add_argument("--size", default=32, help="")
+    plot_subparser.add_argument("--num", default=1, help="")
+    plot_subparser.add_argument("--buffer", default=3389, help="")
+    plot_subparser.add_argument("--num_threads", default=2, help="")
+    plot_subparser.add_argument("--buckets", default=128, help="")
+    plot_subparser.add_argument("--alt_fingerprint", default=None, help="")
+    plot_subparser.add_argument("--farmer_public_key", default=None, help="")
+    plot_subparser.add_argument("--pool_public_key", default=None, help="")
+    plot_subparser.add_argument("--final_dir", required=True, help="Final directory for PLots results")
+    plot_subparser.add_argument("--tmp_dir", default=os.path.join(helpers.getUserNamePath(), "tmp_plot_dir"), help="")
+    plot_subparser.add_argument("--tmp2_dir", default=os.path.join(helpers.getUserNamePath(), "tmp2_plot_dir"), help="")
 
     args = parser.parse_args()
-    if args.stats:
-        stats.runStatsFromUser()
-        sys.exit()
 
-    if args.plot:
-        if not helpers.is_tool(CHIA):
-            logging.error("Unable to find CHIA executable entry point.")
-            sys.exit(-1)
+    try:
+        if args.show:
+            stats.runStats(args.dir)
+            sys.exit()
 
-        try:
-            os.remove(args.tmp_dir)
-            os.remove(args.tmp2_dir)
-        except OSError as e:
-            logging.error(f"Error: {e.strerror}")
+        if args.plot:
+            if not helpers.is_tool(CHIA):
+                logging.error("Unable to find CHIA executable entry point.")
+                raise EnvironmentError
 
-        # Run
-        logging.info(f"Starting CHIA mgr")
-        Run(args)
+            try:
+                os.remove(args.tmp_dir)
+                os.remove(args.tmp2_dir)
+            except OSError as e:
+                logging.warning(f"Error: {e.strerror}")
+
+            # Run
+            logging.info(f"Starting CHIA mgr")
+            Run(args)
+    except:
+        logging.error("CHIA Manager ending in a failure state")
 
 
 # entry point
