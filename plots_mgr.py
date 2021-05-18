@@ -1,12 +1,72 @@
 
+import datetime
+import logging
 import os
 import subprocess
-
-# for output
-dev_null = open(os.devnull, 'w')
+import time
+import psutil
 
 # local
 import helpers
+
+# CHIA
+CHIA = 'chia'
+
+# stop request
+stop_request = False
+
+# global list with all processes running
+procs = []
+
+def cpuThreshold(cpu_percentage: float):
+    cpu_use = psutil.cpu_percent(10.0)
+    logging.info(f"CPU threshold set to {cpu_percentage}, usage at {cpu_use}. Build another plot: {cpu_use <= cpu_percentage}")
+    return cpu_use <= cpu_percentage
+
+def discSpaceAvailable(disc_space: int, running_plots: int):
+    logging.info(f"Disc space set to {disc_space}, using {running_plots * 300}. Build another plot: {disc_space - 300 >= (running_plots * 300)}")
+    return disc_space - 250 >= (running_plots * 250)
+
+def run(args):
+    try:
+        os.remove(args.tmp_dir)
+        os.remove(args.tmp2_dir)
+    except OSError as e:
+        logging.warning(f"Error: {e.strerror}")
+
+    while (not stop_request):
+        # check how many plots are running
+        plots_running = 0
+        for proc in procs:
+            if proc.poll() is None:
+                plots_running += 1
+
+        # Determine if a new Plot should be created
+        cpu = cpuThreshold(args.cpu_threshold)
+        space = discSpaceAvailable(args.disc_space, plots_running)
+
+        if (cpu and space):
+            procs.append(createPlot(
+                        args.final_dir,
+                        args.size,
+                        args.num,
+                        args.buffer,
+                        args.num_threads,
+                        args.buckets,
+                        args.alt_fingerprint,
+                        args.farmer_public_key,
+                        args.pool_public_key,
+                        args.tmp_dir,
+                        args.tmp2_dir))
+            logging.info("--------------------------------------------------------------")
+            logging.info(f"Creating a new Plot: {datetime.datetime.now()}")
+            logging.info("--------------------------------------------------------------")
+
+        # sleep 30 sec
+        time.sleep(30)
+
+# for output
+dev_null = open(os.devnull, 'w')
 
 def createPlot(final_dir,
                size=32,
@@ -56,4 +116,4 @@ def createPlot(final_dir,
         if pool_public_key != None:
             cmd.extend(['--pool_public_key', pool_public_key])
 
-        return subprocess.Popen(cmd, stdout=dev_null)
+        return subprocess.Popen(cmd)

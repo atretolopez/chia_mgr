@@ -5,14 +5,14 @@ import os
 import pandas
 import datetime
 
-def runStats(plotter_path):
+def run(args):
     # check the directory exists
-    if not os.path.isdir(plotter_path):
-        logging.error("Unable to find plot logs")
+    if not os.path.isdir(args.dir):
+        logging.error(f"Unable to find plot logs at {args.dir}")
         raise FileNotFoundError
 
     # get stats from
-    stats = getStatistics(plotter_path)
+    stats = getStatistics(args.dir)
 
     # print them
     printStats(stats)
