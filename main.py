@@ -39,14 +39,11 @@ def main(command_line=None):
 
     args = parser.parse_args(command_line)
 
-    try:
-        logging.info("Starting CHIA mgr")
-        if args.command == 'stats':
-            stats.run(args)
-        elif args.command == 'plots':
-            plots_mgr.run(args)
-    except:
-        logging.error("CHIA Manager ending in a failure state")
+    logging.info("Starting CHIA mgr")
+    if args.command == 'stats':
+        stats.run(args)
+    elif args.command == 'plots':
+        plots_mgr.run(args)
 
 
 # entry point
