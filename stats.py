@@ -64,6 +64,8 @@ def printStats(stats_map, out_path=None):
     df.Phase_2 = pandas.to_datetime(df.Phase_2, unit='s').dt.strftime('%H:%M')
     df.Phase_3 = pandas.to_datetime(df.Phase_3, unit='s').dt.strftime('%H:%M')
     df.Phase_4 = pandas.to_datetime(df.Phase_4, unit='s').dt.strftime('%H:%M')
+    df.Phase_4 = pandas.to_datetime(df.Total_Plot_Time, unit='s').dt.strftime('%H:%M')
+    df.Phase_4 = pandas.to_datetime(df.Copy_Time, unit='s').dt.strftime('%H:%M')
 
     if (out_path != None):
         df.to_excel(out_path)
