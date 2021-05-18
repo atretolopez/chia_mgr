@@ -15,7 +15,7 @@ def run(args):
     stats = getStatistics(args.dir)
 
     # print them
-    printStats(stats)
+    printStats(stats, args.out_dir)
 
 def getStatistics(directory):
     '''
@@ -58,10 +58,14 @@ def getStatistics(directory):
 
     return stats_map
 
-def printStats(stats_map):
+def printStats(stats_map, out_path=None):
     df = pandas.DataFrame(data=stats_map)
     df.Phase_1 = pandas.to_datetime(df.Phase_1, unit='s').dt.strftime('%H:%M')
     df.Phase_2 = pandas.to_datetime(df.Phase_2, unit='s').dt.strftime('%H:%M')
     df.Phase_3 = pandas.to_datetime(df.Phase_3, unit='s').dt.strftime('%H:%M')
     df.Phase_4 = pandas.to_datetime(df.Phase_4, unit='s').dt.strftime('%H:%M')
+
+    if (out_path != None):
+        df.to_excel(out_path)
+
     print(df)

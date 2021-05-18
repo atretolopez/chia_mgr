@@ -18,6 +18,7 @@ def main(command_line=None):
     stats_subparser = subparsers.add_parser(name="stats")
     stats_subparser.add_argument("-s", "--show", action="store_true", help="Show statistics and exit")
     stats_subparser.add_argument("-d", "--dir", default=os.path.join(helpers.getUserNamePath(), '.chia', 'mainnet', 'plotter'), help="Log path")
+    stats_subparser.add_argument("-o", "--out_dir", default=None, help="out_put dir path")
 
     # plot operations
     plot_subparser = subparsers.add_parser(name="plots")
