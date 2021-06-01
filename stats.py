@@ -37,9 +37,10 @@ def getStatistics(directory):
     for filename in os.listdir(directory):
         file = os.path.join(directory, filename)
         if os.path.isfile(file):
-            stats_map["Start_time"].append(datetime.datetime.fromtimestamp(os.path.getctime(file)))
             log = open(file, "r")
             for line in log:
+                if "Time for phase 1/4" in line:
+                    stats_map["Start_time"] = " ".join(line.split()[-5:])
                 if "Time for phase" in line:
                     phase = "Phase_" + line.split()[3]
                     time = line.split()[5]
