@@ -39,7 +39,7 @@ def getStatistics(directory):
         if os.path.isfile(file):
             log = open(file, "r")
             for line in log:
-                if "Time for phase 1/4" in line:
+                if "Starting phase 1/4" in line:
                     stats_map["Start_time"] = " ".join(line.split()[-5:])
                 if "Time for phase" in line:
                     phase = "Phase_" + line.split()[3]
