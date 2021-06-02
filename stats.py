@@ -36,25 +36,35 @@ def getStatistics(directory):
                  }
     for filename in os.listdir(directory):
         file = os.path.join(directory, filename)
+        _, file_extension = os.path.splitext(file)
+        if (file_extension != ".log"):
+            continue
         if os.path.isfile(file):
             log = open(file, "r")
+            stat_map = {}
             for line in log:
                 if "Starting phase 1/4" in line:
-                    stats_map["Start_time"] = " ".join(line.split()[-5:])
-                if "Time for phase" in line:
+                    stat_map["Start_time"] = " ".join(line.split()[-4:])
+                elif "Time for phase" in line:
                     phase = "Phase_" + line.split()[3]
                     time = line.split()[5]
-                    stats_map[phase].append(time)
+                    stat_map[phase] = time
                 elif "Total time" in line:
-                    stats_map["Total_Plot_Time"].append(line.split()[3])
+                    stat_map["Total_Plot_Time"] = line.split()[3]
                 elif "Plot size" in line:
-                    stats_map["KSize"].append(line.split()[3])
+                    stat_map["KSize"] = line.split()[3]
                 elif "Buffer size" in line:
-                    stats_map["RAM"].append(line.split()[3])
+                    stat_map["RAM"] = line.split()[3]
                 elif "threads of stripe" in line:
-                    stats_map["Threads"].append(line.split()[1])
+                    stat_map["Threads"] = line.split()[1]
                 elif "Copy time" in line:
-                    stats_map["Copy_Time"].append(line.split()[3])
+                    stat_map["Copy_Time"] = line.split()[3]
+            if len(stats_map) == len(stat_map):
+                for key in stats_map:
+                    stats_map[key].append(stat_map[key])
+            else:
+                logging.error(f"Incomplete log found: {filename}")
+
 
 
     return stats_map
